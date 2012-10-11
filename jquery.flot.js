@@ -116,7 +116,8 @@
                         horizontal: false
                     },
                     shadowSize: 3,
-                    highlightColor: null
+                    highlightColor: null,
+                    zIndex: 0
                 },
                 grid: {
                     show: true,
@@ -158,6 +159,7 @@
             processDatapoints: [],
             processOffset: [],
             drawBackground: [],
+            prepareSeries: [],
             drawSeries: [],
             draw: [],
             bindEvents: [],
@@ -1387,9 +1389,15 @@
                 drawAxisLabels();
             }
 
-            for (var i = 0; i < series.length; ++i) {
-                executeHooks(hooks.drawSeries, [ctx, series[i]]);
-                drawSeries(series[i]);
+            executeHooks(hooks.prepareSeries, [series]);
+
+            var sorted = series.slice(0).sort(function(first, second) {
+                return first.zIndex - second.zIndex;
+            });
+
+            for (var i = 0; i < sorted.length; ++i) {
+                executeHooks(hooks.drawSeries, [ctx, sorted[i]]);
+                drawSeries(sorted[i]);
             }
 
             executeHooks(hooks.draw, [ctx]);
